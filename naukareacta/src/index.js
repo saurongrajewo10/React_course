@@ -6,13 +6,18 @@ class Square extends React.Component {
     state = {
         character: null
     };
+
     alertMethod() {
         alert('kliknięto w przycisk');
     }
+
     setCharacterState() {
-        // this.setState({ character: this.state.character === 'X' ? 'O' : 'X' });
-        this.setState({ character: 'X' });
+        if(!this.state.character){
+            this.setState({ character: this.props.nextCharacter });
+            this.props.setNextCharacter(this.props.nextCharacter);    
+        }
     };
+
     render() {
         return (
             <button
@@ -26,19 +31,27 @@ class Square extends React.Component {
 
 class Board extends React.Component {
     state = {
-        squares: Array(9).fill(null)
+        squares: Array(9).fill(null),
+        nextCharacter: 'X'
     };
+
+    setNextCharacterHandler = (previousCharacter) => {        
+        this.setState( {nextCharacter : previousCharacter === 'X' ? 'O' : 'X'});
+    }
+
     renderSquare(i) {
-        return <Square value={this.state.squares[i]} />;
+        return <Square value={this.state.squares[i]}  
+                       nextCharacter={this.state.nextCharacter} 
+                       setNextCharacter={this.setNextCharacterHandler}
+        />;
     }
 
     render() {
-        const status = 'Next player: X';
-
+        const status = 'Next player: ';
 
         return (
             <div>
-                <div className="status">{status}</div>
+                <div className="status">{status}{this.state.nextCharacter}</div>
                 <div className="board-row">
                     {this.renderSquare(0)}
                     {this.renderSquare(1)}
