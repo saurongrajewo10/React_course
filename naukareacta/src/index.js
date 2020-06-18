@@ -12,9 +12,10 @@ class Square extends React.Component {
     }
 
     setCharacterState() {
-        if(!this.state.character){
+        if (!this.state.character) {
             this.setState({ character: this.props.nextCharacter });
-            this.props.setNextCharacter(this.props.nextCharacter);    
+            this.props.setNextCharacter();
+
         }
     };
 
@@ -35,14 +36,14 @@ class Board extends React.Component {
         nextCharacter: 'X'
     };
 
-    setNextCharacterHandler = (previousCharacter) => {        
-        this.setState( {nextCharacter : previousCharacter === 'X' ? 'O' : 'X'});
+    setNextCharacterHandler = () => {
+        this.setState({ nextCharacter: this.state.nextCharacter === 'X' ? 'O' : 'X' });
     }
 
     renderSquare(i) {
-        return <Square value={this.state.squares[i]}  
-                       nextCharacter={this.state.nextCharacter} 
-                       setNextCharacter={this.setNextCharacterHandler}
+        return <Square value={this.state.squares[i]}
+            nextCharacter={this.state.nextCharacter}
+            setNextCharacter={this.setNextCharacterHandler}
         />;
     }
 
