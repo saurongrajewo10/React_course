@@ -2,71 +2,94 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
 
-class Square extends React.Component {
-    state = {
-        character: null
-    };
 
-    alertMethod() {
-        alert('kliknięto w przycisk');
-    }
-
-    setCharacterState() {
-        if (!this.state.character) {
-            this.setState({ character: this.props.nextCharacter });
-            this.props.setNextCharacter();
-
-        }
-    };
-
-    render() {
-        return (
-            <button
-                className="square"
-                onClick={() => this.setCharacterState()}>
-                {this.state.character}
-            </button>
-        );
-    }
+function Square(props) {
+    return (
+        <button className="square" onClick={props.clickVariable}>
+            {props.value}
+        </button>
+    );
 }
 
 class Board extends React.Component {
     state = {
         squares: Array(9).fill(null),
-        nextCharacter: 'X'
+        nextPlayer: 'X',
+        listX: [],
+        list0: [],
     };
 
-    setNextCharacterHandler = () => {
-        this.setState({ nextCharacter: this.state.nextCharacter === 'X' ? 'O' : 'X' });
+    calculatingWhoWins() {
+        let winningCombination = [
+            [0, 1, 2],
+            [3, 4, 5],
+            [6, 7, 8],
+            [0, 3, 6],
+            [1, 4, 7],
+            [2, 5, 8],
+            [0, 4, 8],
+            [2, 4, 6]
+        ]
+if (this.state.listX.length >2 ) {
+    const foundX = this.state.listX.some(r=> winningCombination.includes(r))
+    return 'Winner player X'
+}
+if (this.state.list0.length>2) {
+    const found0 = this.state.list0.some(r=> winningCombination.includes(r))
+    return 'Winner player 0'
+}
+
+
     }
 
     renderSquare(i) {
-        return <Square value={this.state.squares[i]}
-            nextCharacter={this.state.nextCharacter}
-            setNextCharacter={this.setNextCharacterHandler}
-        />;
+        return (
+            <Square
+                value={this.state.squares[i]}
+                clickVariable={() => this.handleClick(i)}
+            />
+        );
+    }
+
+    handleClick = (i) => {
+        const squares = this.state.squares.slice();
+        if (squares[i] === null) {
+            squares[i] = this.state.nextPlayer;
+            this.setState({ nextPlayer: this.state.nextPlayer === 'X' ? 'O' : 'X' });
+            this.setState({ squares: squares },
+                () => {
+                    if (this.state.squares[i] === 'X') {
+                        let temporaryListX = this.state.listX;
+                        temporaryListX.push(i);
+                        this.setState({ listX: temporaryListX.sort() });
+                        console.log(this.state.listX)
+                    }
+                    else {
+                        let temporaryList0 = this.state.list0;
+                        temporaryList0.push(i);
+                        this.setState({ list0: temporaryList0.sort() });
+                        console.log(this.state.list0)
+                    }
+                    this.calculatingWhoWins();
+                }
+            );
+        }
     }
 
     render() {
-        const status = 'Next player: ';
+        const status = 'Next player: ' + this.state.nextPlayer;
 
         return (
             <div>
-                <div className="status">{status}{this.state.nextCharacter}</div>
+                <div className="status">{status}</div>
                 <div className="board-row">
-                    {this.renderSquare(0)}
-                    {this.renderSquare(1)}
-                    {this.renderSquare(2)}
+                    {this.renderSquare(0)}{this.renderSquare(1)}{this.renderSquare(2)}
                 </div>
                 <div className="board-row">
-                    {this.renderSquare(3)}
-                    {this.renderSquare(4)}
-                    {this.renderSquare(5)}
+                    {this.renderSquare(3)}{this.renderSquare(4)}{this.renderSquare(5)}
                 </div>
                 <div className="board-row">
-                    {this.renderSquare(6)}
-                    {this.renderSquare(7)}
-                    {this.renderSquare(8)}
+                    {this.renderSquare(6)}{this.renderSquare(7)}{this.renderSquare(8)}
                 </div>
             </div>
         );
