@@ -19,8 +19,8 @@ class Board extends React.Component {
         list0: [],
     };
 
-    calculatingWhoWins() {
-        let winningCombination = [
+    calculatingWhoWins(checkedFields, playerSymbol) {
+        let winningCombinations = [
             [0, 1, 2],
             [3, 4, 5],
             [6, 7, 8],
@@ -30,16 +30,23 @@ class Board extends React.Component {
             [0, 4, 8],
             [2, 4, 6]
         ]
-if (this.state.listX.length >2 ) {
-    const foundX = this.state.listX.some(r=> winningCombination.includes(r))
-    return 'Winner player X'
-}
-if (this.state.list0.length>2) {
-    const found0 = this.state.list0.some(r=> winningCombination.includes(r))
-    return 'Winner player 0'
-}
 
-
+        if(checkedFields.length > 2){
+            for (const combination of winningCombinations) {
+                let howManyFound = 0;
+                for (const num of combination) {
+                    if(!checkedFields.includes(num)){
+                        break;
+                    } else {
+                        howManyFound++;
+                    }
+                }
+                if(howManyFound===3){
+                    window.alert('Player ' + playerSymbol + ' wins!!!!!!!')
+                    break;
+                }
+            }
+        }
     }
 
     renderSquare(i) {
@@ -62,15 +69,16 @@ if (this.state.list0.length>2) {
                         let temporaryListX = this.state.listX;
                         temporaryListX.push(i);
                         this.setState({ listX: temporaryListX.sort() });
-                        console.log(this.state.listX)
+                        console.log(this.state.listX);
+                        this.calculatingWhoWins(this.state.listX, 'X');
                     }
                     else {
                         let temporaryList0 = this.state.list0;
                         temporaryList0.push(i);
                         this.setState({ list0: temporaryList0.sort() });
-                        console.log(this.state.list0)
+                        console.log(this.state.list0);
+                        this.calculatingWhoWins(this.state.list0, '0');
                     }
-                    this.calculatingWhoWins();
                 }
             );
         }
