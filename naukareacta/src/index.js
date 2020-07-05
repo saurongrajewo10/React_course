@@ -17,7 +17,24 @@ class Board extends React.Component {
         nextPlayer: 'X',
         listX: [],
         list0: [],
+        winner: null,
     };
+
+    historyMoves = [];
+    historyMovesCounter = 2;
+
+    goingBackToPreviousMove = () => {
+        if (this.historyMovesCounter <= this.historyMoves.length) {
+            const tempState = this.historyMoves[
+                this.historyMoves.length -
+                this.historyMovesCounter];
+            this.setState({ squares: tempState },
+                () => {
+                    this.historyMovesCounter++;
+                }
+            )
+        }
+    }
 
     calculatingWhoWins(checkedFields, playerSymbol) {
         let winningCombinations = [
@@ -31,18 +48,20 @@ class Board extends React.Component {
             [2, 4, 6]
         ]
 
-        if(checkedFields.length > 2){
+        if (checkedFields.length > 2) {
             for (const combination of winningCombinations) {
                 let howManyFound = 0;
-                for (const num of combination) {
-                    if(!checkedFields.includes(num)){
+                for (const combinationElement of combination) {
+                    if (!checkedFields.includes(combinationElement)) {
                         break;
                     } else {
                         howManyFound++;
                     }
                 }
-                if(howManyFound===3){
-                    window.alert('Player ' + playerSymbol + ' wins!!!!!!!')
+                if (howManyFound === 3) {
+                    this.setState({ winner: playerSymbol }, () => {
+                        window.alert('Player ' + this.state.winner + ' wins!!!!!!!');
+                    });
                     break;
                 }
             }
@@ -60,11 +79,12 @@ class Board extends React.Component {
 
     handleClick = (i) => {
         const squares = this.state.squares.slice();
-        if (squares[i] === null) {
+        if (squares[i] === null && !this.state.winner) {
             squares[i] = this.state.nextPlayer;
             this.setState({ nextPlayer: this.state.nextPlayer === 'X' ? 'O' : 'X' });
             this.setState({ squares: squares },
                 () => {
+                    this.historyMoves.push(this.state.squares);
                     if (this.state.squares[i] === 'X') {
                         let temporaryListX = this.state.listX;
                         temporaryListX.push(i);
@@ -79,13 +99,26 @@ class Board extends React.Component {
                         console.log(this.state.list0);
                         this.calculatingWhoWins(this.state.list0, '0');
                     }
+                    console.log(this.historyMoves)
                 }
             );
+        }
+        else if (squares[i] !== null) {
+            window.alert('To pole zostało juz wybrane');
+        }
+        else {
+            window.alert('Odśwież stronę, wyłoniono juz zwycięzcę');
         }
     }
 
     render() {
-        const status = 'Next player: ' + this.state.nextPlayer;
+        var status
+        if (this.state.winner) {
+            status = 'Player ' + this.state.winner + ' wins!!!!!!!';
+        }
+        else {
+            status = 'Next player: ' + this.state.nextPlayer;
+        }
 
         return (
             <div>
@@ -99,6 +132,7 @@ class Board extends React.Component {
                 <div className="board-row">
                     {this.renderSquare(6)}{this.renderSquare(7)}{this.renderSquare(8)}
                 </div>
+                <button disabled={!this.state.winner} className="button" onClick={this.goingBackToPreviousMove}>Reverse move </button>
             </div>
         );
     }
